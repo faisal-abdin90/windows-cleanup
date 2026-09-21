@@ -131,7 +131,6 @@ try {
         }
     }
     if ('WindowsUpdate' -notin $state.done) {
-        if ($state.updatePasses -ge $config.maxUpdatePasses) { throw 'Windows Update pass limit reached; inspect update history.' }
         if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired') {
             Request-XEReboot
             return
@@ -139,7 +138,8 @@ try {
         $session = New-Object -ComObject Microsoft.Update.Session
         $search = $session.CreateUpdateSearcher().Search("IsInstalled=0 and IsHidden=0 and Type='Software' and BrowseOnly=0")
         if ($search.ResultCode -ne 2) { throw "Windows Update search did not succeed: $($search.ResultCode)" }
-        if ($search.Updates.Count -eq 0) {
+        $decision = Get-XEUpdateDecision -AvailableCount $search.Updates.Count -Passes $state.updatePasses -MaxPasses $config.maxUpdatePasses
+        if ($decision -eq 'Complete') {
             $state.done = @($state.done) + 'WindowsUpdate'
         } else {
             $updates = New-Object -ComObject Microsoft.Update.UpdateColl

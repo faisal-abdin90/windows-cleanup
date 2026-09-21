@@ -85,3 +85,10 @@ function Save-XEJson($Value, [string]$Path) {
     $Value | ConvertTo-Json -Depth 12 | Set-Content "$Path.tmp" -Encoding UTF8
     Move-Item "$Path.tmp" $Path -Force
 }
+
+function Get-XEUpdateDecision {
+    param([int]$AvailableCount, [int]$Passes, [int]$MaxPasses)
+    if ($AvailableCount -eq 0) { return 'Complete' }
+    if ($Passes -ge $MaxPasses) { throw 'Windows Update pass limit reached; inspect update history.' }
+    return 'Install'
+}

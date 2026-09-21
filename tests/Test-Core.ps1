@@ -4,6 +4,9 @@ if (-not (Test-Path "$root/scripts/Core.ps1")) { throw 'FAIL: deployment validat
 . "$root/scripts/Core.ps1"
 function Assert($condition, $message) { if (-not $condition) { throw "FAIL: $message" } }
 function Rejects([scriptblock]$action) { try { & $action } catch { return }; throw 'FAIL: invalid input was accepted' }
+Assert ((Get-XEUpdateDecision -AvailableCount 0 -Passes 5 -MaxPasses 5) -eq 'Complete') 'final clean update scan is allowed at the pass limit'
+Rejects { Get-XEUpdateDecision -AvailableCount 1 -Passes 5 -MaxPasses 5 }
+Assert ((Get-XEUpdateDecision -AvailableCount 1 -Passes 4 -MaxPasses 5) -eq 'Install') 'update installation below pass limit'
 $config = Get-Content "$root/config/deployment.json" -Raw | ConvertFrom-Json
 Test-XEConfig $config
 Rejects { Test-XEResetAuthorization -Mode ResetAndProvision -EraseData:$false }
