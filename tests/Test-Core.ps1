@@ -28,6 +28,24 @@ Assert ($wifi.WLANProfile.connectionMode -eq 'auto') 'automatic Wi-Fi connection
 Rejects { New-XEUnattend $config 'XE-INVALID-NAME-TOO-LONG' }
 $config.action1.url = 'http://example.com/agent.msi'
 Rejects { Test-XEConfig $config }
+# Exercise the real entry points: a missing erasure flag must fail before any OS/network calls.
+foreach ($entry in @('Deploy-XE.ps1','Bootstrap.ps1')) {
+    $parameters = @{ Mode='ResetAndProvision' }
+    if ($entry -eq 'Bootstrap.ps1') { $parameters.Revision = '0000000000000000000000000000000000000000' }
+    $rejected = $false
+    try { & "$root/$entry" @parameters } catch {
+        Assert ($_.Exception.Message -match 'EraseData') "entry point $entry must reject reset explicitly"
+        $rejected = $true
+    }
+    Assert $rejected "entry point $entry allowed reset without authorization"
+}
+$tempState = Join-Path ([IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString() + '.json')
+try {
+    Save-XEJson @{ status='RetryPending'; done=@('Action1'); attempts=2; lastError='network unavailable' } $tempState
+    $savedState = Get-Content $tempState -Raw | ConvertFrom-Json
+    Assert ($savedState.attempts -eq 2 -and $savedState.done[0] -eq 'Action1') 'checkpoints survive serialization'
+    Assert (-not (Test-Path "$tempState.tmp")) 'checkpoint temporary file removed after commit'
+} finally { Remove-Item $tempState -ErrorAction SilentlyContinue }
 Get-ChildItem $root -Recurse -Filter '*.ps1' | ForEach-Object {
     $tokens = $null; $errors = $null
     [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors)
