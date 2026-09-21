@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Reset>
+  <Run Phase="FactoryReset_AfterImageApply">
+    <Path>Restore-XE.cmd</Path>
+    <Duration>5</Duration>
+  </Run>
+</Reset>

@@ -1,0 +1,13 @@
+{
+  "account": { "name": "XE-Admin", "password": "1234" },
+  "wifi": { "ssid": "Xenial Events", "password": "Xenial@2025", "authentication": "WPA2PSK" },
+  "timeZone": "Arabian Standard Time",
+  "action1": { "url": "https://app.eu.action1.com/agent/2d2ab1e4-168c-11ef-99b6-9bb6def7507e/Windows/agent(My_Organization).msi" },
+  "apps": [
+    { "id": "Google.Chrome", "source": "winget" },
+    { "id": "Adobe.Acrobat.Reader.64-bit", "source": "winget" },
+    { "id": "9NKSQGP7F2NH", "source": "msstore" }
+  ],
+  "maxUpdatePasses": 5,
+  "maxSetupAttempts": 12
+}
