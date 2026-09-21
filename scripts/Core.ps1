@@ -43,11 +43,12 @@ function New-XEWifiXml {
 "@
 }
 function New-XEUnattend {
-    param($Config, [string]$ComputerName)
+    param($Config, [string]$ComputerName, [string]$Locale = 'en-US')
     if ($ComputerName -notmatch '^XE-[0-9]{8}$') { throw 'Expected XE- followed by eight digits.' }
     $user = ConvertTo-XEXml $Config.account.name
     $password = ConvertTo-XEXml $Config.account.password
     $zone = ConvertTo-XEXml $Config.timeZone
+    $localeXml = ConvertTo-XEXml $Locale
     @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
@@ -62,6 +63,9 @@ function New-XEUnattend {
   </component>
  </settings>
  <settings pass="oobeSystem">
+  <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+   <InputLocale>en-US</InputLocale><SystemLocale>$localeXml</SystemLocale><UserLocale>$localeXml</UserLocale>
+  </component>
   <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
    <TimeZone>$zone</TimeZone>
    <OOBE><HideEULAPage>true</HideEULAPage><HideOEMRegistrationScreen>true</HideOEMRegistrationScreen><HideOnlineAccountScreens>true</HideOnlineAccountScreens><HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE><ProtectYourPC>3</ProtectYourPC></OOBE>

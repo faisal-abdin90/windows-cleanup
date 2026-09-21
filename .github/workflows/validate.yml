@@ -5,6 +5,7 @@ permissions:
 jobs:
   powershell:
     runs-on: windows-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Test Windows PowerShell 5.1
@@ -20,3 +21,14 @@ jobs:
           $issues = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error
           $issues | Format-Table -AutoSize
           if ($issues) { throw 'Script analysis errors found.' }
+      - name: Check Action1 MSI publisher (no installation)
+        shell: powershell
+        run: |
+          $config = Get-Content ./config/deployment.json -Raw | ConvertFrom-Json
+          $msi = Join-Path $env:RUNNER_TEMP 'action1.msi'
+          Invoke-WebRequest $config.action1.url -OutFile $msi -UseBasicParsing
+          $signature = Get-AuthenticodeSignature $msi
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Action1') {
+            throw "Action1 MSI signature validation failed: $($signature.Status)"
+          }
+          Write-Output "Verified publisher: $($signature.SignerCertificate.Subject)"

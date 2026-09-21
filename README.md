@@ -10,6 +10,7 @@ Reset Windows 11 Pro event laptops locally and provision `XE-Admin` automaticall
 - Downloads a specific GitHub commit and stages recovery files and a signed Action1 installer before reset.
 - Invokes Windows' local **Remove everything** reset (`doWipeMethod`). This removes OS-volume user data and applications; it is not secure drive sanitization or a guarantee that secondary drives are erased.
 - Restores an unattended setup file through Microsoft's recovery extensibility mechanism, without `ms-cxh:localonly` or a compiled PPKG.
+- Preserves the current system locale and selects an English (US) keyboard during setup.
 - Creates `XE-Admin` / `1234`, enables persistent automatic desktop sign-in, assigns a fresh random `XE-########` hostname, and configures the supplied Wi-Fi and UAE UTC+4 time.
 - Reinstalls Action1 from its organization-specific MSI; installs Chrome, Acrobat Reader and WhatsApp with WinGet in the XE-Admin user context.
 - Applies Chrome default associations, optional desktop/account images and a best-effort lock-screen policy.

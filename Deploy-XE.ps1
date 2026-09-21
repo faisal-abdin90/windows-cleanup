@@ -43,7 +43,7 @@ New-Item "$stage/payload" -ItemType Directory -Force | Out-Null
 try {
     foreach ($folder in @('scripts','config','assets')) { Copy-Item "$PSScriptRoot/$folder" "$stage/payload/" -Recurse }
     $name = 'XE-' + (Get-Random -Minimum 10000000 -Maximum 100000000)
-    New-XEUnattend $config $name | Set-Content "$stage/Unattend.xml" -Encoding UTF8
+    New-XEUnattend $config $name -Locale (Get-WinSystemLocale).Name | Set-Content "$stage/Unattend.xml" -Encoding UTF8
     New-XEWifiXml $config | Set-Content "$stage/payload/wifi.xml" -Encoding UTF8
     New-Item "$stage/payload/installers" -ItemType Directory | Out-Null
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
