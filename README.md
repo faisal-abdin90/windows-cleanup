@@ -54,6 +54,22 @@ That final command is also the fleet entry point **after the pilot succeeds**. R
 
 If Action1 launches a 32-bit shell, launch the downloaded bootstrap using `%WINDIR%\Sysnative\WindowsPowerShell\v1.0\powershell.exe` from that process. Use the normal System32 PowerShell path from a 64-bit process.
 
+## Launch locally without Action1
+
+Open **Windows PowerShell as administrator** on a supported laptop. Download `Start-XELocal.ps1` from this repository (use a pinned commit for repeatable deployments), then run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-XELocal.ps1 -Mode Check
+```
+
+For the destructive reset, replace `-Mode Check` with `-Mode ResetAndProvision -EraseData`. `-Mode Stage` only prepares recovery assets.
+
+The launcher requires 64-bit Windows PowerShell 5.1. It creates an administrator/SYSTEM-only working directory, downloads the bootstrap, and starts a one-time scheduled task as Local SYSTEM. No Action1 or PsExec installation is needed beforehand. The same supported-device and reset-readiness restrictions still apply; this is not an installer for arbitrary Windows editions or domain-joined computers.
+
+The default deployment revision is `4a9f27f3c859d15f51be4cf174ce8f396690c594`. To include newer media/configuration, supply `-Revision` with the desired full 40-character deployment commit. The local launcher's own download revision and its `-Revision` deployment selection are separate.
+
+The command shows the task log and propagates errors. Logs/results remain in the printed `C:\ProgramData\XE-Local-<id>` directory. The worker removes its scheduled task after execution. A successful reset can restart the laptop before the local command returns. If the wait times out, inspect the task/log rather than starting a duplicate reset; timing out does not cancel it. After reset, your organization's Action1 agent is installed as part of the normal XE configuration.
+
 ## Recovery and execution
 
 1. `Bootstrap.ps1` downloads the pinned source archive.

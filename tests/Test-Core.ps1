@@ -32,7 +32,7 @@ Rejects { New-XEUnattend $config 'XE-INVALID-NAME-TOO-LONG' }
 $config.action1.url = 'http://example.com/agent.msi'
 Rejects { Test-XEConfig $config }
 # Exercise the real entry points: a missing erasure flag must fail before any OS/network calls.
-foreach ($entry in @('Deploy-XE.ps1','Bootstrap.ps1')) {
+foreach ($entry in @('Deploy-XE.ps1','Bootstrap.ps1','Start-XELocal.ps1')) {
     $parameters = @{ Mode='ResetAndProvision' }
     if ($entry -eq 'Bootstrap.ps1') { $parameters.Revision = '0000000000000000000000000000000000000000' }
     $rejected = $false
